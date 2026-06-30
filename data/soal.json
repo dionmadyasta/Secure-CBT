@@ -1,0 +1,41 @@
+{
+  "activeExamId": "exam-1",
+  "exams": [
+    {
+      "isEnabled": true,
+      "autoActivateAt": "",
+      "allowedStudents": "all",
+      "id": "exam-1",
+      "title": "Ujian Harian IPA - Biologi",
+      "type": "native",
+      "googleFormUrl": "",
+      "randomize": false,
+      "showOneByOne": true,
+      "duration": 600
+    },
+    {
+      "isEnabled": false,
+      "autoActivateAt": "",
+      "allowedStudents": "all",
+      "id": "exam-2",
+      "title": "Kuis Geografi Lingkungan (Google Form)",
+      "type": "google-form",
+      "googleFormUrl": "https://docs.google.com/forms/d/e/1FAIpQLScY_L8G-zIuJj8pM5B11Jd8U_bQ9n1n5J2D_g6_1W_5s9r-9Q/viewform?embedded=true",
+      "randomize": false,
+      "showOneByOne": false,
+      "duration": 1800
+    },
+    {
+      "isEnabled": false,
+      "autoActivateAt": "",
+      "allowedStudents": "all",
+      "id": "exam-1782847648961",
+      "title": "Ujian hidup",
+      "type": "native",
+      "googleFormUrl": "",
+      "randomize": false,
+      "showOneByOne": false,
+      "duration": 3600
+    }
+  ]
+}

@@ -17,23 +17,19 @@ This project is dedicated to my friend Pipit Haryadi, a teacher at SMP Negeri 3 
 - **Context Menu Block**: Disables right-click to prevent copying questions or inspecting elements.
 
 ## How to Deploy to Vercel & Setup Database
-1. Push this project repository to your GitHub account. (Note: Ensure sensitive data like `data/data_siswa.json` and `data/data_guru.json` are **ignored** and not committed, while `data/soal/` can be safely committed).
+1. Push this project repository to your GitHub account (including the `data/` folder).
 2. Go to [Vercel](https://vercel.com/) and sign in with your GitHub account.
 3. Click on **Add New...** > **Project** and import your GitHub repository.
 4. Leave the build settings as default and click **Deploy**.
 
-### Upstash KV Setup & Data Migration
-Since this project handles sensitive student credentials, we do not commit the `data/` folder to GitHub. Therefore, the deployed Vercel app will initially have an empty database. We use **Upstash Redis** (Vercel KV) to securely store our data.
+### Upstash KV Setup (For Data Persistence)
+Vercel Serverless environment resets the local file system on every invocation. To keep your data (such as new students, questions, or live sessions) permanent, we use **Upstash Redis** (Vercel KV).
 
 1. In your Vercel Project Dashboard, navigate to the **Storage** tab.
 2. Select **Upstash for Redis** and connect it to your project.
-3. Go to the **.env.local** section of your Upstash database in Vercel and copy the `KV_REST_API_URL` (or `UPSTASH_REDIS_REST_URL`) and `KV_REST_API_TOKEN`.
-4. Open the `migrate.js` file in your local project and paste the URL and Token.
-5. Run the migration script locally to push your local JSON data to the Vercel KV database:
-   ```bash
-   node migrate.js
-   ```
-6. Your Vercel app is now securely connected to the Upstash database and ready for login!
+3. Once connected, Vercel will automatically add the required environment variables (`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`).
+4. Re-deploy your app if needed so it detects the variables.
+5. **Automatic Migration**: Since your `data/` folder is pushed to GitHub, Vercel will read your local JSON data on its first run and automatically migrate it into Upstash KV! No manual migration is needed.
 
 ## Screenshots
 

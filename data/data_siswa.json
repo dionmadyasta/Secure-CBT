@@ -1,0 +1,42 @@
+[
+  {
+    "id": "s1",
+    "username": "siswa1",
+    "password": "123",
+    "name": "Budi Santoso",
+    "class": "VII-A",
+    "qrCode": "siswa1:123",
+    "grade": "VII",
+    "subClass": "A"
+  },
+  {
+    "id": "s2",
+    "username": "siswa2",
+    "password": "123",
+    "name": "Siti Rahma",
+    "class": "VIII-B",
+    "qrCode": "siswa2:123",
+    "grade": "VIII",
+    "subClass": "B"
+  },
+  {
+    "id": "s3",
+    "username": "siswa3",
+    "password": "123",
+    "name": "Ahmad Dani",
+    "class": "IX-C",
+    "qrCode": "siswa3:123",
+    "grade": "IX",
+    "subClass": "C"
+  },
+  {
+    "id": "s-1782839865268",
+    "name": "Dion",
+    "class": "VII-A",
+    "username": "dion",
+    "password": "123",
+    "qrCode": "dion:123",
+    "grade": "VII",
+    "subClass": "A"
+  }
+]

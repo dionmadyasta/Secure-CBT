@@ -2,9 +2,8 @@
 node_modules/
 jspm_packages/
 
-# Project Database (Sensitive student data & exam keys)
-data/*
-!data/soal/
+# Project Database
+# (User stated it is safe to commit data/)
 
 # Build and deployment outputs
 .vercel/
