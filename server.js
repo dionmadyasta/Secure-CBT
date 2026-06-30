@@ -55,13 +55,16 @@ let db = {
 
 // Get database state
 async function getDB() {
-  // If Vercel KV environment variables are configured, fetch from Redis
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+  const kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  // If Vercel KV or Upstash environment variables are configured, fetch from Redis
+  if (kvUrl && kvToken) {
     try {
       const { createClient } = require('@vercel/kv');
       const kv = createClient({
-        url: process.env.KV_REST_API_URL,
-        token: process.env.KV_REST_API_TOKEN,
+        url: kvUrl,
+        token: kvToken,
       });
       const data = await kv.get('secure_cbt_db');
       if (data) {
@@ -207,13 +210,16 @@ async function saveDB(currentDb) {
     }
   });
 
-  // If Vercel KV env vars are configured, save to Redis
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+  // If Vercel KV or Upstash env vars are configured, save to Redis
+  const kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (kvUrl && kvToken) {
     try {
       const { createClient } = require('@vercel/kv');
       const kv = createClient({
-        url: process.env.KV_REST_API_URL,
-        token: process.env.KV_REST_API_TOKEN,
+        url: kvUrl,
+        token: kvToken,
       });
       await kv.set('secure_cbt_db', currentDb);
       return;
