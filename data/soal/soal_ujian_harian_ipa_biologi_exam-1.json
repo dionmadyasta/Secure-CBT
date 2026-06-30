@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1,
+    "question": "Suhu tubuh manusia normal berkisar antara...",
+    "options": {
+      "A": "35.0°C - 36.0°C",
+      "B": "36.5°C - 37.5°C",
+      "C": "37.5°C - 38.5°C",
+      "D": "38.0°C - 39.0°C"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 2,
+    "question": "Zat hijau daun yang berperan dalam fotosintesis pada tumbuhan disebut...",
+    "options": {
+      "A": "Melanin",
+      "B": "Klorofil",
+      "C": "Hemoglobin",
+      "D": "Karoten"
+    },
+    "answer": "B"
+  },
+  {
+    "id": 3,
+    "question": "Organ tubuh manusia yang berfungsi untuk memompa darah ke seluruh tubuh adalah...",
+    "options": {
+      "A": "Paru-paru",
+      "B": "Hati",
+      "C": "Jantung",
+      "D": "Ginjal"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 4,
+    "question": "Planet terdekat dari Matahari dalam sistem tata surya kita adalah...",
+    "options": {
+      "A": "Venus",
+      "B": "Mars",
+      "C": "Merkurius",
+      "D": "Yupiter"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 5,
+    "question": "Gaya tarik-menarik antara bumi dengan benda lain di sekitarnya disebut gaya...",
+    "options": {
+      "A": "Magnet",
+      "B": "Gravitasi",
+      "C": "Gesek",
+      "D": "Pegas"
+    },
+    "answer": "B"
+  }
+]
