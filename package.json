@@ -1,0 +1,14 @@
+{
+  "name": "cbt-anti-cheat-mvp",
+  "version": "1.0.0",
+  "description": "CBT MVP with anti-cheating mechanisms using Vanilla JS and Node.js",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@vercel/kv": "^1.0.1",
+    "express": "^4.19.2",
+    "ws": "^8.16.0"
+  }
+}

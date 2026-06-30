@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure-CBT | Dashboard Guru & Pengawas</title>
+
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- QRious Library for generating QR Code cards -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="/guru/app.js" defer></script>
+
+  <link rel="stylesheet" href="/guru/style.css">
+  <script>
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.add('light-mode');
+    }
+  </script>
+</head>
+
+<body>
+
+  <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" title="Ubah Tema">☀️</button>
+
+  <!-- Teacher Login Screen -->
+  <div id="login-container" class="login-wrapper">
+    <div class="login-card glass-card">
+      <div class="login-header">
+        <span class="login-icon">🛡️</span>
+        <h2>Secure-CBT Admin</h2>
+        <p>Silakan masuk untuk mengakses dashboard pengawas</p>
+      </div>
+      <div id="login-error-msg" class="error-box hidden">Username atau Password salah!</div>
+      <form id="teacher-login-form">
+        <div class="input-group">
+          <label for="login-username">Username Admin</label>
+          <input type="text" id="login-username" placeholder="Masukkan username admin..." required autocomplete="off">
+        </div>
+        <div class="input-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="Masukkan password admin..." required
+            autocomplete="off">
+        </div>
+        <button type="submit" class="btn-primary"
+          style="width: 100%; padding: 12px; margin-top: 10px; font-size: 0.95rem;">Masuk Dashboard ➔</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="dashboard-container hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <img src="/img/logo.png" alt="Logo SMP N 3 Wates"
+          style="width: 48px; height: 48px; object-fit: contain; border-radius: 8px;">
+        <h2>Secure-CBT</h2>
+        <span
+          style="font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.04em; margin-top: -4px; display: block;">SMP
+          N 3 Wates</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-item active" data-tab="tab-monitoring">
+          <span class="nav-icon">📺</span> Live Monitoring
+        </button>
+        <button type="button" class="nav-item" data-tab="tab-students">
+          <span class="nav-icon">👥</span> Kelola Siswa
+        </button>
+        <button type="button" class="nav-item" data-tab="tab-teachers">
+          <span class="nav-icon">🧑‍🏫</span> Kelola Guru
+        </button>
+        <button type="button" class="nav-item" data-tab="tab-exams">
+          <span class="nav-icon">📝</span> Kelola Ujian
+        </button>
+        <button type="button" class="nav-item" data-tab="tab-results">
+          <span class="nav-icon">📊</span> Hasil & Riwayat
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" class="logout-link">⬅ Logout</a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- Top header bar -->
+      <header class="main-header">
+        <div class="header-title">
+          <h1 id="page-title">Live Monitoring</h1>
+          <p id="page-desc">Pantau status pengerjaan siswa dan pelanggaran secara real-time.</p>
+        </div>
+
+      </header>
+
+      <!-- ==========================================
+           TAB: MONITORING
+           ========================================== -->
+      <section id="tab-monitoring" class="dashboard-tab active-tab">
+        <!-- Quick stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Total Siswa</h3>
+            <p id="stat-total-students" class="stat-value">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Siswa Aktif</h3>
+            <p id="stat-active-students" class="stat-value text-indigo">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Selesai Ujian</h3>
+            <p id="stat-finished-students" class="stat-value text-emerald">0</p>
+          </div>
+          <div class="stat-card danger-stat">
+            <h3>Terdeteksi Curang</h3>
+            <p id="stat-cheat-students" class="stat-value text-red">0</p>
+          </div>
+        </div>
+
+        <div class="monitoring-layout">
+          <!-- Active students status grid -->
+          <div class="monitoring-card flex-2">
+            <div class="card-header">
+              <h2>📋 Daftar Siswa & Progress</h2>
+              <span id="active-exam-label" class="badge">Ujian Aktif: ...</span>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Nama Siswa</th>
+                      <th>Kelas</th>
+                      <th>Status</th>
+                      <th>Progress</th>
+                      <th>Pelanggaran</th>
+                      <th>Skor / Hasil</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="monitoring-students-tbody">
+                    <!-- Dynamic rendering -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Realtime violation scrolling logs -->
+          <div class="monitoring-card flex-1 danger-card">
+            <div class="card-header">
+              <h2>⚠️ Log Pelanggaran Real-time</h2>
+            </div>
+            <div class="card-body">
+              <div id="violation-logs" class="violation-logs-list">
+                <!-- Dynamic logs entry -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Question Analytics -->
+        <div class="monitoring-card" id="question-analytics-card" style="margin-top: 24px;">
+          <div class="card-header">
+            <h2>📊 Analitik Soal Real-time</h2>
+            <span id="analytics-exam-label" class="badge">—</span>
+          </div>
+          <div class="card-body">
+            <div id="question-analytics-container">
+              <div style="text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 0.875rem;">
+                Belum ada data jawaban siswa yang masuk.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==========================================
+           TAB: STUDENTS MANAGEMENT
+           ========================================== -->
+      <section id="tab-students" class="dashboard-tab">
+        <div class="action-card-header"
+          style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+          <h2>👥 Manajemen Data Siswa</h2>
+          <div style="margin-left: auto; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button type="button" id="btn-bulk-delete" class="btn-danger"
+              style="display: none; background: var(--color-danger); padding: 10px 14px; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+              🗑️ Hapus Terpilih (<span id="bulk-delete-count">0</span>)
+            </button>
+
+            <a href="#" id="btn-download-template" class="btn-secondary"
+              style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; border-radius: 8px; font-weight: 500; font-size: 0.85rem; border: 1px solid var(--card-border); color: white; background: rgba(255,255,255,0.02); transition: all 0.2s;">
+              📥 Template CSV
+            </a>
+
+            <label class="btn-secondary"
+              style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px; border-radius: 8px; font-weight: 500; font-size: 0.85rem; border: 1px solid var(--card-border); color: white; background: rgba(255,255,255,0.02); cursor: pointer; margin-bottom: 0; transition: all 0.2s;">
+              📤 Import CSV
+              <input type="file" id="input-import-csv" accept=".csv" style="display: none;">
+            </label>
+
+            <button type="button" id="btn-add-student" class="btn-indigo">➕ Tambah Siswa Baru</button>
+          </div>
+        </div>
+
+        <div class="students-layout" style="display: flex; gap: 20px; align-items: flex-start; margin-top: 10px;">
+          <!-- Left Sidebar: Class Filter -->
+          <div class="dashboard-card class-sidebar" style="width: 250px; flex-shrink: 0; padding: 20px;">
+            <h3
+              style="font-size: 0.95rem; font-weight: 600; margin-bottom: 15px; color: var(--text-secondary); border-bottom: 1px solid var(--card-border); padding-bottom: 10px;">
+              🏫 Daftar Rombel (Kelas)</h3>
+            <div class="class-filter-list" style="display: flex; flex-direction: column; gap: 8px;">
+              <button type="button" class="class-filter-btn active" data-class="all" id="btn-class-all"
+                style="text-align: left; background: rgba(255,255,255,0.06); border: 1px solid var(--color-indigo); border-radius: 8px; padding: 10px 14px; color: white; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; width: 100%; transition: all 0.2s ease;">
+                <span>Semua Siswa</span>
+                <span id="class-count-all" class="badge"
+                  style="background: var(--color-indigo); padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;">0</span>
+              </button>
+
+              <div class="class-grade-group">
+                <div
+                  style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin: 12px 0 6px 4px; text-transform: uppercase; letter-spacing: 0.05em;">
+                  Tingkat VII (Kelas 1)</div>
+                <div id="class-list-vii" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 2px;"></div>
+              </div>
+
+              <div class="class-grade-group">
+                <div
+                  style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin: 12px 0 6px 4px; text-transform: uppercase; letter-spacing: 0.05em;">
+                  Tingkat VIII (Kelas 2)</div>
+                <div id="class-list-viii" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 2px;"></div>
+              </div>
+
+              <div class="class-grade-group">
+                <div
+                  style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin: 12px 0 6px 4px; text-transform: uppercase; letter-spacing: 0.05em;">
+                  Tingkat IX (Kelas 3)</div>
+                <div id="class-list-ix" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 2px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Student Table -->
+          <div class="dashboard-card" style="flex-grow: 1; min-width: 0; padding: 24px;">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nama Lengkap</th>
+                    <th>Kelas</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th style="text-align: center; width: 80px;">Kartu</th>
+                    <th style="text-align: center; width: 100px;">Aksi</th>
+                    <th style="width: 40px; text-align: center; padding: 12px 8px;">
+                      <input type="checkbox" id="check-all-students" style="width: 16px; height: 16px; cursor: pointer;"
+                        title="Pilih Semua">
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="students-tbody">
+                  <!-- Dynamic student list -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB: TEACHER MANAGEMENT
+           ========================================== -->
+      <section id="tab-teachers" class="dashboard-tab">
+        <div class="action-card-header"
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2>🧑‍🏫 Kelola Data Guru & Pengawas</h2>
+          <button type="button" id="btn-add-teacher" class="btn-indigo">➕ Tambah Guru Baru</button>
+        </div>
+
+        <div class="dashboard-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nama Lengkap</th>
+                  <th>Username</th>
+                  <th>Password</th>
+                  <th style="text-align: center; width: 150px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="teachers-tbody">
+                <!-- Dynamic teachers list -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB: EXAM MANAGEMENT
+           ========================================== -->
+      <section id="tab-exams" class="dashboard-tab">
+        <div class="exams-management-layout">
+
+          <!-- Exams List & Activation -->
+          <div class="dashboard-card flex-1">
+            <div class="card-header">
+              <h2>📝 Daftar Ujian</h2>
+              <button type="button" id="btn-new-exam" class="btn-sm-indigo" style="font-size:0.8rem;">➕ Buat Ujian
+                Baru</button>
+            </div>
+            <div class="card-body">
+              <div id="exams-list-container" class="exams-list">
+                <!-- Dynamic exams card list -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Add / Edit Exam Form -->
+          <div class="dashboard-card flex-2" id="exam-editor-card">
+            <div class="card-header">
+              <h2 id="exam-form-title">Pengaturan</h2>
+            </div>
+            <div class="card-body">
+              <form id="exam-editor-form">
+                <input type="hidden" id="edit-exam-id">
+
+                <!-- BASIC INFO -->
+                <div class="input-row">
+                  <div class="input-group">
+                    <label for="exam-title">Nama / Judul Ujian</label>
+                    <input type="text" id="exam-title" placeholder="Contoh: Ujian Akhir Matematika" required>
+                  </div>
+                  <div class="input-group">
+                    <label for="exam-duration">Durasi (Menit)</label>
+                    <input type="number" id="exam-duration" value="60" min="1" required>
+                  </div>
+                </div>
+
+                <div class="input-row">
+                  <div class="input-group">
+                    <label for="exam-type">Jenis Soal / Platform</label>
+                    <select id="exam-type" required>
+                      <option value="native">Native CBT (Soal di input di sistem ini)</option>
+                      <option value="google-form">Google Form (Iframe Terproteksi)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- STATUS & JADWAL -->
+                <div class="exam-section-divider">Status &amp; Penjadwalan</div>
+                <div class="input-row">
+                  <div class="input-group">
+                    <label>Status Ujian</label>
+                    <label class="toggle-switch-label" for="exam-is-enabled"
+                      style="height: 46px; box-sizing: border-box;">
+                      <input type="checkbox" id="exam-is-enabled" class="toggle-switch-input">
+                      <span class="toggle-switch-track">
+                        <span class="toggle-switch-thumb"></span>
+                      </span>
+                      <span class="toggle-switch-text" id="exam-enabled-text">Non-aktif</span>
+                    </label>
+                    <p class="input-tip">Aktifkan agar siswa bisa mengerjakan ujian ini.</p>
+                  </div>
+                  <div class="input-group">
+                    <label for="exam-auto-activate">Auto Aktif pada Tanggal &amp; Jam</label>
+                    <input type="datetime-local" id="exam-auto-activate"
+                      style="color-scheme: dark; height: 46px; box-sizing: border-box;">
+                    <p class="input-tip">Opsional. Jika diisi, ujian otomatis aktif pada waktu ini (WIB / UTC+7).</p>
+                  </div>
+                </div>
+
+                <!-- PESERTA UJIAN -->
+                <div class="exam-section-divider">Peserta Ujian</div>
+                <div class="input-group">
+                  <div class="allowed-radio-group">
+                    <label class="allowed-radio-option">
+                      <input type="radio" name="allowed-mode" id="allowed-all" value="all" checked>
+                      <span class="allowed-radio-box">
+                        <span class="allowed-radio-icon">🌐</span>
+                        <span class="allowed-radio-title">Semua Siswa</span>
+                        <span class="allowed-radio-desc">Semua siswa terdaftar bisa mengikuti</span>
+                      </span>
+                    </label>
+                    <label class="allowed-radio-option">
+                      <input type="radio" name="allowed-mode" id="allowed-class" value="by-class">
+                      <span class="allowed-radio-box">
+                        <span class="allowed-radio-icon">🏫</span>
+                        <span class="allowed-radio-title">Per Kelas</span>
+                        <span class="allowed-radio-desc">Pilih satu atau beberapa kelas</span>
+                      </span>
+                    </label>
+                    <label class="allowed-radio-option">
+                      <input type="radio" name="allowed-mode" id="allowed-manual" value="manual">
+                      <span class="allowed-radio-box">
+                        <span class="allowed-radio-icon">✋</span>
+                        <span class="allowed-radio-title">Manual</span>
+                        <span class="allowed-radio-desc">Pilih siswa satu per satu</span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Class Selection Panel -->
+                <div id="exam-class-panel" class="hidden">
+                  <div class="input-group">
+                    <label>Pilih Kelas Peserta</label>
+                    <p class="input-tip" style="margin-bottom: 10px;">Centang kelas yang diizinkan mengikuti ujian ini.
+                    </p>
+                    <div id="exam-class-checkboxes" class="class-checkboxes-grid"></div>
+                  </div>
+                </div>
+
+                <!-- Manual Student Selection Panel -->
+                <div id="exam-manual-panel" class="hidden">
+                  <div class="input-group">
+                    <label>Pilih Siswa Manual</label>
+                    <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items: center;">
+                      <input type="text" id="exam-student-search" placeholder="🔍 Cari nama atau username siswa..."
+                        style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--card-border); background: rgba(255,255,255,0.05); color: white; font-family: var(--font-family); font-size: 0.85rem;">
+                      <button type="button" id="exam-select-all-students" class="btn-secondary"
+                        style="padding: 8px 12px; font-size: 0.8rem; white-space: nowrap;">Pilih Semua</button>
+                    </div>
+                    <div id="exam-manual-student-list" class="manual-student-list"></div>
+                    <p class="input-tip" id="exam-manual-selected-count" style="margin-top: 8px;">0 siswa dipilih</p>
+                  </div>
+                </div>
+
+                <!-- Google Form configurations -->
+                <div id="exam-gform-group" class="input-group hidden">
+                  <div class="exam-section-divider">Konfigurasi Google Form</div>
+                  <label for="exam-gform-url">Link URL Google Form (Embed / View Form)</label>
+                  <input type="url" id="exam-gform-url"
+                    placeholder="https://docs.google.com/forms/d/.../viewform?embedded=true">
+                  <p class="input-tip">Pastikan link menggunakan format `embedded=true` agar form terisi penuh di
+                    iframe.</p>
+                </div>
+
+                <!-- Native CBT configurations -->
+                <div id="exam-native-group">
+                  <div class="exam-section-divider">Konfigurasi Soal Native CBT</div>
+                  <div class="config-toggles-row">
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="exam-randomize">
+                      <span class="checkmark"></span>
+                      Acak Urutan Soal
+                    </label>
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="exam-onebyone">
+                      <span class="checkmark"></span>
+                      Tampilkan Satu Soal Per Layar
+                    </label>
+                    <label class="checkbox-container">
+                      <input type="checkbox" id="exam-showall" checked>
+                      <span class="checkmark"></span>
+                      Tampilkan Semua Soal
+                    </label>
+                  </div>
+
+                  <div class="question-builder-header">
+                    <h3>Edit Butir Soal Ujian</h3>
+                    <button type="button" id="btn-add-question" class="btn-sm-indigo">➕ Tambah Soal</button>
+                  </div>
+
+                  <div id="questions-builder-container" class="questions-builder-list">
+                    <!-- Dynamic question inputs -->
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" id="btn-cancel-exam-edit" class="btn-secondary hidden">Batal</button>
+                  <button type="submit" id="btn-save-exam" class="btn-indigo">💾 Simpan Ujian</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB: EXAM RESULTS & HISTORY
+           ========================================== -->
+      <section id="tab-results" class="dashboard-tab">
+        <div class="action-card-header">
+          <h2>📊 Hasil & Riwayat Ujian</h2>
+          <div class="results-filter-bar">
+            <label for="results-exam-select"
+              style="margin-right: 10px; font-weight: 500; color: var(--text-secondary);">Pilih Paket Ujian:</label>
+            <select id="results-exam-select" class="select-inline"
+              style="background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: white; padding: 8px 12px; border-radius: 8px; font-family: var(--font-family); min-width: 250px;">
+              <!-- Dynamic exams list -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Selected Exam Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Total Peserta</h3>
+            <p id="result-stat-total" class="stat-value">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Selesai Mengerjakan</h3>
+            <p id="result-stat-finished" class="stat-value text-emerald">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Total Pelanggaran</h3>
+            <p id="result-stat-violations" class="stat-value text-red">0</p>
+          </div>
+        </div>
+
+        <div class="dashboard-card">
+          <div class="card-header"
+            style="border-bottom: none; margin-bottom: 0; padding-bottom: 0; display: flex; justify-content: space-between; align-items: center;">
+            <h3 id="result-exam-title">Hasil Nilai Siswa</h3>
+            <div class="action-buttons" style="display: flex; gap: 10px;">
+              <button type="button" id="btn-results-reset" class="btn-sm-danger" style="padding: 10px 16px;">⚠️ Reset
+                Sesi</button>
+              <button type="button" id="btn-results-csv" class="btn-indigo" style="padding: 10px 16px;">📥 Download
+                CSV</button>
+            </div>
+          </div>
+          <div class="table-responsive" style="margin-top: 20px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nama Lengkap</th>
+                  <th>Kelas</th>
+                  <th>Status</th>
+                  <th>Progress Soal</th>
+                  <th>Pelanggaran</th>
+                  <th>Skor / Hasil Akhir</th>
+                </tr>
+              </thead>
+              <tbody id="results-tbody">
+                <!-- Dynamic results list -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Modal: Tambah / Edit Siswa -->
+  <div id="student-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="student-modal-title">Tambah Siswa Baru</h2>
+        <button type="button" class="close-modal-btn" onclick="closeStudentModal()">×</button>
+      </div>
+      <form id="student-form">
+        <input type="hidden" id="edit-student-id">
+        <div class="input-group">
+          <label for="student-name">Nama Lengkap</label>
+          <input type="text" id="student-name" placeholder="Masukkan nama siswa..." required autocomplete="off">
+        </div>
+        <div class="input-group-row" style="display: flex; gap: 15px;">
+          <div class="input-group" style="flex: 1;">
+            <label for="student-grade">Tingkat Kelas</label>
+            <select id="student-grade" required
+              style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: white; font-family: var(--font-family);">
+              <option value="VII">VII (Kelas 1)</option>
+              <option value="VIII">VIII (Kelas 2)</option>
+              <option value="IX">IX (Kelas 3)</option>
+            </select>
+          </div>
+          <div class="input-group" style="flex: 1;">
+            <label for="student-subclass">Abjad / Rombel</label>
+            <select id="student-subclass" required
+              style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: white; font-family: var(--font-family);">
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+              <option value="E">E</option>
+              <option value="F">F</option>
+              <option value="G">G</option>
+              <option value="H">H</option>
+              <option value="I">I</option>
+              <option value="J">J</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="student-username">Username</label>
+          <input type="text" id="student-username" placeholder="Untuk login..." required autocomplete="off">
+        </div>
+        <div class="input-group">
+          <label for="student-password">Password</label>
+          <input type="text" id="student-password" placeholder="Password login..." required autocomplete="off">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeStudentModal()">Batal</button>
+          <button type="submit" class="btn-primary">Simpan Siswa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Tambah / Edit Guru -->
+  <div id="teacher-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="teacher-modal-title">Tambah Guru Baru</h2>
+        <button type="button" class="close-modal-btn" onclick="closeTeacherModal()">×</button>
+      </div>
+      <form id="teacher-form">
+        <input type="hidden" id="edit-teacher-id">
+        <div class="input-group">
+          <label for="teacher-name">Nama Lengkap</label>
+          <input type="text" id="teacher-name" placeholder="Masukkan nama guru..." required autocomplete="off">
+        </div>
+        <div class="input-group">
+          <label for="teacher-username">Username</label>
+          <input type="text" id="teacher-username" placeholder="Untuk login..." required autocomplete="off">
+        </div>
+        <div class="input-group">
+          <label for="teacher-password">Password</label>
+          <input type="text" id="teacher-password" placeholder="Password login..." required autocomplete="off">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeTeacherModal()">Batal</button>
+          <button type="submit" class="btn-primary">Simpan Guru</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Tampilkan / Cetak QR Code Kartu Ujian -->
+  <div id="qr-modal" class="modal hidden">
+    <div class="modal-content qr-modal-content">
+      <div class="modal-header">
+        <h2>Kartu Ujian Siswa</h2>
+        <button type="button" class="close-modal-btn" onclick="closeQrModal()">×</button>
+      </div>
+      <div class="modal-body qr-card-body" id="print-area">
+        <div class="qr-card">
+          <div class="qr-card-header">
+            <h4>KARTU UJIAN ONLINE</h4>
+            <h3>SECURE-CBT SYSTEM</h3>
+          </div>
+          <div class="qr-card-main">
+            <div class="qr-card-info">
+              <p><strong>Nama:</strong> <span id="qr-card-name">Budi Santoso</span></p>
+              <p><strong>Kelas:</strong> <span id="qr-card-class">VII-A</span></p>
+              <p><strong>Username:</strong> <span id="qr-card-user">siswa1</span></p>
+              <p><strong>Password:</strong> <span id="qr-card-pass">123</span></p>
+            </div>
+            <div class="qr-card-code">
+              <canvas id="qr-canvas"></canvas>
+            </div>
+          </div>
+          <div class="qr-card-footer">
+            <p>Pindai QR Code di atas menggunakan kamera halaman login siswa untuk langsung masuk ujian.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer qr-modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeQrModal()">Tutup</button>
+        <button type="button" class="btn-primary" onclick="printQrCard()">🖨️ Cetak Kartu</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

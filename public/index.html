@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure-CBT Portal | Sistem Ujian Terproteksi</title>
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary-color: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-color: #ec4899;
+      --card-bg: rgba(30, 41, 59, 0.45);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+
+    /* Glow Elements */
+    .glow-sphere {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      filter: blur(100px);
+      z-index: 0;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .glow-1 {
+      background: var(--primary-color);
+      top: 10%;
+      left: 15%;
+    }
+    .glow-2 {
+      background: var(--accent-color);
+      bottom: 10%;
+      right: 15%;
+    }
+
+    .portal-container {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 900px;
+      width: 100%;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    header {
+      margin-bottom: 3.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      color: #a5b4fc;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(4px);
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 1rem;
+      background: linear-gradient(to right, #ffffff 30%, #a5b4fc 70%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Cards Grid */
+    .portal-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    @media (min-width: 768px) {
+      .portal-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .portal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 3rem 2rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-main);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .portal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+      pointer-events: none;
+    }
+
+    .portal-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(99, 102, 241, 0.35);
+      box-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.45);
+    }
+
+    .portal-card.siswa-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
+    }
+
+    .portal-card.guru-card:hover {
+      border-color: rgba(236, 72, 153, 0.4);
+      box-shadow: 0 15px 30px rgba(236, 72, 153, 0.15);
+    }
+
+    .card-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .siswa-card .card-icon {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      color: #818cf8;
+    }
+
+    .guru-card .card-icon {
+      background: rgba(236, 72, 153, 0.15);
+      border: 1px solid rgba(236, 72, 153, 0.25);
+      color: #f472b6;
+    }
+
+    .portal-card:hover .card-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .card-btn {
+      width: 100%;
+      padding: 0.85rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .siswa-card .card-btn {
+      background: var(--primary-color);
+      color: #ffffff;
+    }
+
+    .siswa-card:hover .card-btn {
+      background: var(--primary-hover);
+    }
+
+    .guru-card .card-btn {
+      background: transparent;
+      border: 1px solid rgba(236, 72, 153, 0.5);
+      color: #f472b6;
+    }
+
+    .guru-card:hover .card-btn {
+      background: var(--accent-color);
+      color: #ffffff;
+      border-color: var(--accent-color);
+    }
+
+    footer {
+      margin-top: 5rem;
+      font-size: 0.875rem;
+      color: rgba(148, 163, 184, 0.5);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Decorative Glowing Spheres -->
+  <div class="glow-sphere glow-1"></div>
+  <div class="glow-sphere glow-2"></div>
+
+  <div class="portal-container">
+    
+    <header>
+      <img src="/img/logo.png" alt="Logo SMP N 3 Wates" style="width: 64px; height: 64px; object-fit: contain; margin: 0 auto 10px; display: block;">
+      <div class="badge">
+        <span>SMP N 3 Wates</span>
+      </div>
+      <h1>Sistem Ujian Online SMP</h1>
+      <p>Pilih portal Anda di bawah ini untuk memulai. Dilengkapi dengan deteksi kecurangan real-time yang canggih.</p>
+    </header>
+
+    <div class="portal-grid">
+      <!-- Portal Siswa -->
+      <a href="/siswa" class="portal-card siswa-card">
+        <div class="card-icon">📝</div>
+        <h2 class="card-title">Portal Siswa</h2>
+        <p class="card-desc">Masuk menggunakan Akun Siswa atau Pindai QR Code Kartu Ujian untuk mulai mengerjakan soal.</p>
+        <div class="card-btn">
+          Mulai Ujian <span>➔</span>
+        </div>
+      </a>
+
+      <!-- Portal Guru -->
+      <a href="/guru" class="portal-card guru-card">
+        <div class="card-icon">📊</div>
+        <h2 class="card-title">Portal Guru / Pengawas</h2>
+        <p class="card-desc">Akses Dashboard monitoring kecurangan, kelola data siswa, kuis, acak soal, serta export nilai ujian ke CSV.</p>
+        <div class="card-btn">
+          Masuk Dashboard <span>➔</span>
+        </div>
+      </a>
+    </div>
+
+    <footer>
+      <p>&copy; 2026 Secure-CBT System. Dikembangkan untuk Integritas Pendidikan.</p>
+    </footer>
+
+  </div>
+
+</body>
+</html>

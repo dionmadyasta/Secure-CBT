@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CBT Ujian Terproteksi | Portal Siswa</title>
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- html5-qrcode library for QR Code scanning -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  
+  <link rel="stylesheet" href="/siswa/style.css">
+  <script>
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.add('light-mode');
+    }
+  </script>
+</head>
+<body class="no-select">
+
+  <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" title="Ubah Tema">☀️</button>
+
+  <!-- Main Container -->
+  <main id="app-container" class="glass-card">
+    
+    <!-- Phase 1: Login Screen -->
+    <section id="login-screen" class="active-section">
+      <div class="header-logo">
+        <div class="logo-icon">📝</div>
+        <h1>CBT Online Siswa</h1>
+        <p>Sistem Ujian Terintegrasi & Terproteksi</p>
+      </div>
+      
+      <!-- Login Tabs -->
+      <div class="login-tabs">
+        <button type="button" id="tab-manual" class="login-tab-btn active">Login Manual</button>
+        <button type="button" id="tab-qr" class="login-tab-btn">Pindai Kartu QR</button>
+      </div>
+
+      <!-- Error Message Box -->
+      <div id="login-error" class="error-box hidden">Username atau Password salah!</div>
+
+      <!-- Login Manual Form -->
+      <form id="login-form">
+        <div class="input-group">
+          <label for="student-username">Username Siswa</label>
+          <input type="text" id="student-username" placeholder="Masukkan username Anda..." required autocomplete="off">
+        </div>
+        <div class="input-group">
+          <label for="student-password">Password</label>
+          <input type="password" id="student-password" placeholder="Masukkan password Anda..." required autocomplete="off">
+        </div>
+        
+        <div class="disclaimer-box">
+          <h3>⚠️ Peraturan Penting Ujian:</h3>
+          <ul>
+            <li>Dilarang membuka tab baru, browser lain, atau berpindah aplikasi.</li>
+            <li>Dilarang keluar dari mode Layar Penuh (Fullscreen).</li>
+            <li>Dilarang mengambil screenshot atau merekam layar.</li>
+            <li>Teks soal dilindungi (copy-paste dimatikan).</li>
+            <li>Segala pelanggaran akan tercatat dan dilaporkan langsung ke server Guru secara otomatis.</li>
+          </ul>
+        </div>
+        
+        <button type="submit" id="start-btn" class="primary-btn">Mulai Ujian Sekarang</button>
+      </form>
+
+      <!-- QR Reader Section (Hidden initially) -->
+      <div id="qr-section" class="hidden">
+        <p class="qr-hint">Arahkan kartu ujian QR Anda ke kamera untuk login otomatis.</p>
+        <div class="qr-scanner-wrapper">
+          <div id="qr-reader"></div>
+        </div>
+        <button type="button" id="back-to-manual" class="secondary-btn" style="width: 100%; margin-top: 1rem;">Kembali ke Login Manual</button>
+      </div>
+    </section>
+
+    <!-- Phase 2: Exam Screen (Hidden initially) -->
+    <section id="exam-screen" class="hidden-section">
+      <header class="exam-header">
+        <div class="student-info-panel">
+          <span id="display-student-name">Nama Siswa</span>
+          <span id="display-student-class" class="badge">Kelas</span>
+        </div>
+        <div class="system-status">
+          <span id="connection-status" class="status-indicator online">Aktif</span>
+          <span id="violation-count" class="badge danger-badge">0 Pelanggaran</span>
+        </div>
+      </header>
+
+      <div class="exam-body">
+        <div class="exam-meta">
+          <h2 id="exam-title-display">Memuat Ujian...</h2>
+          <div class="timer-box">
+            <span>Sisa Waktu:</span>
+            <span id="countdown">00:00</span>
+          </div>
+        </div>
+
+        <!-- Google Form Embed Container -->
+        <div id="google-form-container" class="hidden">
+          <div class="iframe-overlay-blocker" title="Proteksi Anti-Cheat Aktif"></div>
+          <iframe id="google-form-iframe" src="" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">Memuat...</iframe>
+          <div class="google-form-submit-box">
+            <p>Jika Anda sudah selesai mengerjakan di Google Form di atas, klik tombol di bawah untuk mengumpulkan data ujian di sistem CBT ini:</p>
+            <button type="button" id="submit-gform-btn" class="submit-btn">Kumpulkan Ujian Sekarang</button>
+          </div>
+        </div>
+
+        <!-- Native Quiz Container -->
+        <form id="exam-form" class="hidden">
+          <div id="questions-container">
+            <!-- Questions will be injected here dynamically -->
+          </div>
+          
+          <!-- One by one Question Navigation Control -->
+          <div id="navigation-controls" class="navigation-controls hidden">
+            <button type="button" id="prev-btn" class="nav-btn">⬅ Sebelumnya</button>
+            <span id="question-progress-label">Soal 1 dari 1</span>
+            <button type="button" id="next-btn" class="nav-btn">Berikutnya ➡</button>
+          </div>
+          
+          <button type="submit" id="submit-btn" class="submit-btn">Kumpulkan Jawaban</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Phase 3: Finish Screen (Hidden initially) -->
+    <section id="finish-screen" class="hidden-section">
+      <div class="success-icon">✓</div>
+      <h1>Ujian Selesai Dikumpulkan</h1>
+      <p>Terima kasih telah mengerjakan ujian dengan jujur.</p>
+      
+      <div class="score-summary">
+        <p>Hasil Ujian Anda:</p>
+        <div id="final-score" class="score-value">0 / 0</div>
+        <div id="final-violation" class="violation-summary">Total Pelanggaran: 0 kali</div>
+      </div>
+      
+      <p class="footer-note">Hasil dan log ujian telah terekam aman di server guru.</p>
+      <a href="/" class="primary-btn" style="text-decoration: none; display: inline-block; margin-top: 1.5rem; width: auto; padding: 0.75rem 2rem;">Kembali ke Beranda</a>
+    </section>
+
+  </main>
+
+  <!-- Anti-Cheat Overlay Alert -->
+  <div id="cheat-overlay" class="overlay hidden">
+    <div class="overlay-content">
+      <h2>⚠️ Peringatan Keras</h2>
+      <p id="cheat-message">Anda terdeteksi melakukan tindakan mencurigakan!</p>
+      <button id="resume-btn" class="primary-btn">Saya Paham, Kembali ke Ujian</button>
+    </div>
+  </div>
+
+  <script src="/siswa/app.js"></script>
+</body>
+</html>
