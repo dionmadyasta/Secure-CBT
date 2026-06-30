@@ -5,8 +5,8 @@ const path = require('path');
 // MASUKKAN CREDENTIAL UPSTASH/VERCEL KV DI BAWAH INI:
 // Kamu bisa ambil di Vercel Dashboard -> Storage -> Pilih Upstash -> .env.local
 // =========================================================================
-const KV_REST_API_URL = "REMOVED_URL";
-const KV_REST_API_TOKEN = "REMOVED_TOKEN";
+const KV_REST_API_URL = "";
+const KV_REST_API_TOKEN = "";
 // =========================================================================
 
 async function migrate() {
